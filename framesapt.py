@@ -5,8 +5,8 @@ import psi4
 
 def calculate_sapt(selections: list, universe: mda.Universe, frame_num: int, memory: str):
     def write_xyz(selection: str, unv: mda.Universe, frame: int):
-        group = universe.select_atoms('resid ' + selection)
-        path =  selection + '_' + str(frame) + '.xyz'
+        group = unv.select_atoms('resid ' + selection)
+        path = selection + '_' + str(frame) + '.xyz'
 
         with mda.Writer(path, group.n_atoms) as coords:
             coords.write(group)
@@ -68,7 +68,7 @@ class FrameSAPT(AnalysisBase):
         self.energies = []
 
     def _single_frame(self):
-        self.time_list.append()
+        pass
 
     def _conclude(self):
         pass
@@ -78,4 +78,3 @@ if __name__ == '__main__':
     unv = mda.Universe()
     atp = unv.select_atoms('resid 378')
     er2k = unv.select_atoms('segid 2')
-    
