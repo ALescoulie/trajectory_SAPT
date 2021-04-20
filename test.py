@@ -4,7 +4,8 @@ import unittest
 
 class FrameTest(unittest.TestCase):
 
-    def test_write_xyz0(self):
+    def test_write_xyz0(self) -> None:
+        pass
 
 
 
