@@ -72,6 +72,53 @@ def save_sapt_in(coords0: list, coords1: list, memory: int, path: str):
             input_file.write(line)
 
 
+def check_inputs(selection: list, start: int, stop: int, step: int, universe: mda.Universe):
+    ag_sel = selection[0]
+    ag_names = selection[1]
+    ag_pair = selection[2]
+
+    # Testing names and selections
+    if len(ag_sel) > ag_pair:
+        raise InputError('Not all selections are named')
+    elif len(ag_sel) < len(ag_names):
+        raise InputError('Too many selection names for number of selections')
+
+    for sel in ag_sel:
+        try:
+            ag = universe.select_atoms(sel)
+        except mda.SelectionError:
+            raise InputError('Error in selection:', sel)
+        except mda.SelectionWarning:
+            raise InputError('Warning on selection: ', sel)
+
+    for pair in ag_pair:
+        if len(pair) != 2:
+            raise InputError('Pairs must be a python list of string with only two items')
+        found0 = False
+        found1 = False
+        for name in ag_names:
+            if pair[0] == name:
+                found = True
+            if found0 is False:
+                raise InputError(pair[0], ' in ', pair, 'group_pair_selections is not in defined in atom_group_names')
+            if found1 is False:
+                raise InputError(pair[1], ' in ', pair, 'group_pair_selections is not in defined in atom_group_names')
+
+        if start >= stop:
+            raise InputError('Start is greater than or equal to stop')
+        if step >= stop:
+            raise InputError('Step is greater than or equal to stop')
+
+        if len(universe.trajectory) < stop:
+            raise InputError('Stop exceeds length of trajectory, trajectory is ', len(universe.trajectory), ' frames')
+
+    print('Input Parameters Accepted')
+
+
+class InputError(Exception):
+    pass
+
+
 class Psi4SAPTGenerator(AnalysisBase):
     def __init__(self, universe: mda.Universe, selections: list, memory: int):
         super(Psi4SAPTGenerator).__init__(universe.trajectory)
