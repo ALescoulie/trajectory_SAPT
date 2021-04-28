@@ -81,5 +81,3 @@ freeze_core true
 memory 60GB
 
 energy('sapt0')
-
-

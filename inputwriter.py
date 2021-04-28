@@ -4,7 +4,7 @@ import os
 
 
 def write_xyz(selection: str, universe: mda.Universe, pathname: str):
-    group = universe.select_atoms('resid ' + selection)
+    group = universe.select_atoms(selection)
 
     pathname += '.xyz'
     with mda.Writer(pathname, group.n_atoms) as coords:
@@ -15,11 +15,7 @@ def write_xyz(selection: str, universe: mda.Universe, pathname: str):
 def read_xyz(xyz_path):
     with open(xyz_path, 'r') as coord_file:
         xyz_data = []
-        coord_data = coord_file.readlines()[1:]
-        images = 0
-        for line in coord_data:
-            if line == '\n':
-                images += 1
+        coord_data = coord_file.readlines()[2:]
 
         for line in coord_data:
             if '.' in line:
@@ -32,33 +28,28 @@ def read_xyz(xyz_path):
 def save_sapt_in(coords0: list, coords1: list, memory: int, path: str):
     coord_data = '0 1\n'
 
-    for line in coords0:
-        if '|' not in line:
-            items = line.split()
-            line = ''
-            items[0] = items[0][0]
-            for item in items:
-                item += (' ' + item)
-                coord_data += (line + '\n')
+    for line0 in coords0:
+        items = line0.split()
+        line0 = items[0][0]
+        for item in items[1:]:
+            line0 += (' ' + item)
+        coord_data += (line0 + '\n')
 
-        coord_data += '--\n'
-        coord_data += '-1 1\n'
+    coord_data += '--\n'
+    coord_data += '-1 1\n'
 
-    for line in coords1:
-        if '|' not in line:
-            items = line.split()
-            line = ''
-            items[0] = items[0][0]
-            for item in items:
-                line += (' ' + item)
-            coord_data += (line + '\n')
+    for line1 in coords1:
+        items = line1.split()
+        line1 = items[0][0]
+        for item in items[1:]:
+            line1 += (' ' + item)
+        coord_data += (line1 + '\n')
 
-    coord_data += ''
-    coord_data += 'units angstrom\n ' \
+    coord_data += '\nunits angstrom\n ' \
                   '\n' \
                   '}\n' \
-                  '\nset\n' \
-                  '{basis jun-cc-pVDZ\n' \
+                  '\nset {\n' \
+                  'basis jun-cc-pVDZ\n' \
                   'scf_type df\n' \
                   'freeze_core\n' \
                   '{\n'
