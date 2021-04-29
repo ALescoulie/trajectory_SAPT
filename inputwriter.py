@@ -132,7 +132,7 @@ class Psi4SAPTGenerator(AnalysisBase):
         for ind in range(len(self.selection_coords)):
             write_xyz(self.selection_coords[ind], self._unv, f'{self._dir}/{self.selection_names[ind]}')
 
-        time = self._unv.trajectory.time
+        time = int(self._unv.trajectory.time)
         name = f'{self._mol}_{time}'
         for pair in self.interaction_pairs:
             coords0 = read_xyz(f'{self._dir}/{pair[0]}.xyz')
