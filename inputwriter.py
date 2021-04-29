@@ -25,8 +25,9 @@ def read_xyz(xyz_path):
     # Saves coords as a string
 
 
-def save_sapt_in(coords0: list, coords1: list, memory: int, path: str):
-    coord_data = '0 1\n'
+def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_name: str):
+    coord_data = 'molecule %s {\n' % molecule_name
+    coord_data += '0 1\n'
 
     for line0 in coords0:
         items = line0.split()
@@ -69,7 +70,7 @@ def check_inputs(selection: list, start: int, stop: int, step: int, universe: md
     ag_pair = selection[2]
 
     # Testing names and selections
-    if len(ag_sel) > ag_pair:
+    if len(ag_sel) > len(ag_names):
         raise InputError('Not all selections are named')
     elif len(ag_sel) < len(ag_names):
         raise InputError('Too many selection names for number of selections')
@@ -78,9 +79,7 @@ def check_inputs(selection: list, start: int, stop: int, step: int, universe: md
         try:
             ag = universe.select_atoms(sel)
         except mda.SelectionError:
-            raise InputError('Error in selection:', sel)
-        except mda.SelectionWarning:
-            raise InputError('Warning on selection: ', sel)
+            raise InputError('Error in selection: {}'.format(sel))
 
     for pair in ag_pair:
         if len(pair) != 2:
@@ -89,11 +88,13 @@ def check_inputs(selection: list, start: int, stop: int, step: int, universe: md
         found1 = False
         for name in ag_names:
             if pair[0] == name:
-                found = True
-            if found0 is False:
-                raise InputError(pair[0], ' in ', pair, 'group_pair_selections is not in defined in atom_group_names')
-            if found1 is False:
-                raise InputError(pair[1], ' in ', pair, 'group_pair_selections is not in defined in atom_group_names')
+                found0 = True
+            if pair[1] == name:
+                found1 = True
+        if found0 is False:
+            raise InputError(f'{pair[0]} in {pair} group_pair_selections is not in defined in atom_group_names')
+        if found1 is False:
+            raise InputError(f'{pair[1]} in {pair} group_pair_selections is not in defined in atom_group_names')
 
         if start >= stop:
             raise InputError('Start is greater than or equal to stop')
@@ -101,7 +102,7 @@ def check_inputs(selection: list, start: int, stop: int, step: int, universe: md
             raise InputError('Step is greater than or equal to stop')
 
         if len(universe.trajectory) < stop:
-            raise InputError('Stop exceeds length of trajectory, trajectory is ', len(universe.trajectory), ' frames')
+            raise InputError(f'Stop exceeds length of trajectory, trajectory is {len(universe.trajectory)} frames')
 
     print('Input Parameters Accepted')
 
@@ -111,14 +112,18 @@ class InputError(Exception):
 
 
 class Psi4SAPTGenerator(AnalysisBase):
-    def __init__(self, universe: mda.Universe, selections: list, memory: int):
+    def __init__(self, universe: mda.Universe, selections: list, memory: int, input_directory: str, molecule_name: str):
         super(Psi4SAPTGenerator).__init__(universe.trajectory)
         self._unv = universe
         self._sel = selections
         self._mem = memory
+        self._dir = input_directory
+        self._mol = molecule_name
 
     def _prepare(self):
-        self.time_list = []
+        """Defining data structures, selection_coords contains MDAnalysis selection commands,
+         selections names contains names of the atom groups selected, and interaction_pairs
+         contains the atom group names in list pairs. selections are pre-verified by check_inputs"""
         self.selection_coords = self._sel[0]
         self.selection_names = self._sel[1]
         self.interaction_pairs = self._sel[2]
@@ -127,14 +132,16 @@ class Psi4SAPTGenerator(AnalysisBase):
         for ind in range(len(self.selection_coords)):
             write_xyz(self.selection_coords[ind], self._unv, self.selection_names[ind])
 
+        time = self._unv.trajectory.time
+        name = f'{self._mol}_{time}'
         for pair in self.interaction_pairs:
-            coords0 = read_xyz(pair[0] + '.xyz')
-            coords1 = read_xyz(pair[1] + '.xyz')
+            coords0 = read_xyz(f'{self._dir}/{pair[0]}.xyz')
+            coords1 = read_xyz(f'{self._dir}/{pair[0]}.xyz')
 
-            path = 'frame' + self._unv.trajectory.time + '_' + pair[0] + '_' + pair[1]
-            save_sapt_in(coords0, coords1, self._mem, path)
+            path = f'{self._dir}/frame{time}_{pair[0]}_{pair[1]}.in'
+            save_sapt_in(coords0, coords1, self._mem, path, name)
 
     def _conclude(self):
         for path in self.selection_names:
-            path += '.xyz'
+            path = f'{self._dir}/{path}.xyz'
             os.remove(path)
