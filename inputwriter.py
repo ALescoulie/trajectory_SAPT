@@ -113,7 +113,7 @@ class InputError(Exception):
 
 class Psi4SAPTGenerator(AnalysisBase):
     def __init__(self, universe: mda.Universe, selections: list, memory: int, input_directory: str, molecule_name: str):
-        super(Psi4SAPTGenerator).__init__(universe.trajectory)
+        super(Psi4SAPTGenerator, self).__init__(universe.trajectory)
         self._unv = universe
         self._sel = selections
         self._mem = memory
@@ -130,7 +130,7 @@ class Psi4SAPTGenerator(AnalysisBase):
 
     def _single_frame(self):
         for ind in range(len(self.selection_coords)):
-            write_xyz(self.selection_coords[ind], self._unv, self.selection_names[ind])
+            write_xyz(self.selection_coords[ind], self._unv, f'{self._dir}{self.selection_names[ind]}')
 
         time = self._unv.trajectory.time
         name = f'{self._mol}_{time}'
