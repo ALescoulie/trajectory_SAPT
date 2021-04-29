@@ -130,7 +130,7 @@ class Psi4SAPTGenerator(AnalysisBase):
 
     def _single_frame(self):
         for ind in range(len(self.selection_coords)):
-            write_xyz(self.selection_coords[ind], self._unv, f'{self._dir}{self.selection_names[ind]}')
+            write_xyz(self.selection_coords[ind], self._unv, f'{self._dir}/{self.selection_names[ind]}')
 
         time = self._unv.trajectory.time
         name = f'{self._mol}_{time}'
