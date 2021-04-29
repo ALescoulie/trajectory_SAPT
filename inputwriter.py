@@ -45,18 +45,18 @@ def save_sapt_in(coords0: list, coords1: list, memory: int, path: str):
             line1 += (' ' + item)
         coord_data += (line1 + '\n')
 
-    coord_data += '\nunits angstrom\n ' \
+    coord_data += '\nunits angstrom\n' \
                   '\n' \
                   '}\n' \
                   '\nset {\n' \
                   'basis jun-cc-pVDZ\n' \
                   'scf_type df\n' \
-                  'freeze_core\n' \
-                  '{\n'
+                  'freeze_core true\n' \
+                  '}\n'
 
     coord_data += '\n' + 'memory ' + str(memory) + 'GB\n'
 
-    coord_data += "energy('sapt0')"
+    coord_data += "\nenergy('sapt0')\n"
 
     with open(path, 'w+') as input_file:
         for line in coord_data:
