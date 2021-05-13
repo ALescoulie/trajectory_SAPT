@@ -100,6 +100,8 @@ def check_inputs(selection: list, start: int, stop: int, step: int, universe: md
             raise InputError('Start is greater than or equal to stop')
         if step >= stop:
             raise InputError('Step is greater than or equal to stop')
+        if step == 0:
+            raise InputError('Step cannot be 0')
 
         if len(universe.trajectory) < stop:
             raise InputError(f'Stop exceeds length of trajectory, trajectory is {len(universe.trajectory)} frames')
@@ -136,7 +138,7 @@ class Psi4SAPTGenerator(AnalysisBase):
         name = f'{self._mol}_{time}'
         for pair in self.interaction_pairs:
             coords0 = read_xyz(f'{self._dir}/{pair[0]}.xyz')
-            coords1 = read_xyz(f'{self._dir}/{pair[0]}.xyz')
+            coords1 = read_xyz(f'{self._dir}/{pair[1]}.xyz')
 
             path = f'{self._dir}/frame{time}_{pair[0]}_{pair[1]}.in'
             save_sapt_in(coords0, coords1, self._mem, path, name)
