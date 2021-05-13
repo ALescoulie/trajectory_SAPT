@@ -136,7 +136,7 @@ class Psi4SAPTGenerator(AnalysisBase):
         name = f'{self._mol}_{time}'
         for pair in self.interaction_pairs:
             coords0 = read_xyz(f'{self._dir}/{pair[0]}.xyz')
-            coords1 = read_xyz(f'{self._dir}/{pair[0]}.xyz')
+            coords1 = read_xyz(f'{self._dir}/{pair[1]}.xyz')
 
             path = f'{self._dir}/frame{time}_{pair[0]}_{pair[1]}.in'
             save_sapt_in(coords0, coords1, self._mem, path, name)
