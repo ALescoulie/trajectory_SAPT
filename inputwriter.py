@@ -1,6 +1,7 @@
 from MDAnalysis.analysis.base import AnalysisBase
 import MDAnalysis as mda
 import os
+import sys
 
 
 def write_xyz(selection: str, universe: mda.Universe, pathname: str):
@@ -147,3 +148,9 @@ class Psi4SAPTGenerator(AnalysisBase):
         for path in self.selection_names:
             path = f'{self._dir}/{path}.xyz'
             os.remove(path)
+
+
+if __name__ == '__main__':
+    topology_path = ''
+    trajectory_path = ''
+
