@@ -1,7 +1,6 @@
 from MDAnalysis.analysis.base import AnalysisBase
 import MDAnalysis as mda
 import os
-import sys
 
 
 def write_xyz(selection: str, universe: mda.Universe, pathname: str):
