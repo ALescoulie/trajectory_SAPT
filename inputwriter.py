@@ -27,7 +27,7 @@ def read_xyz(xyz_path):
 
 def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_name: str):
     coord_data = 'molecule %s {\n' % molecule_name
-    coord_data += '0 1'
+    coord_data += '-1 1\n'
 
     for line0 in coords0:
         items = line0.split()
@@ -37,7 +37,7 @@ def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_
         coord_data += (line0 + '\n')
 
     coord_data += '--\n'
-    coord_data += '-1 1'
+    coord_data += '0 1\n'
 
     for line1 in coords1:
         items = line1.split()
@@ -55,7 +55,7 @@ def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_
                   'freeze_core True\n' \
                   '}\n'
 
-    coord_data += '\n' + 'memory ' + str(memory) + 'GB\n'
+    coord_data += '\n' + 'memory ' + str(memory) + ' GB\n'
 
     coord_data += "\nenergy('sapt0')\n"
 
@@ -114,7 +114,7 @@ def write_sh(in_path: str, memory: str, cpus: str, walltime: str) -> None:
         outpath.write('#!/bin/bash\n')
         outpath.write('#\n')
         outpath.write(f'#PBS -N {in_path}\n')
-        outpath.write(f'#PBS -l select=1:ncpus={cpus}:mem={memory}')
+        outpath.write(f'#PBS -l select=1:ncpus={cpus}:mem={memory}gb')
         outpath.write(f'#PBS -l walltime={walltime}')
         outpath.write('#PBS -q skystd')
         outpath.write('#PBS -j oe')
