@@ -1,4 +1,4 @@
-from inputwriter import *
+from trajectory_SAPT.inputwriter import *
 import MDAnalysis as mda
 import unittest
 
@@ -6,8 +6,8 @@ import unittest
 class FrameTest(unittest.TestCase):
 
     def test_read_write_xyz0(self) -> None:
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         ag = 'resid 1'
         path = 'Met1'

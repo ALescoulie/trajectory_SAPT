@@ -27,6 +27,7 @@ def read_xyz(xyz_path):
 
 def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_name: str):
     coord_data = 'molecule %s {\n' % molecule_name
+    coord_data += '0 1'
 
     for line0 in coords0:
         items = line0.split()
@@ -36,6 +37,7 @@ def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_
         coord_data += (line0 + '\n')
 
     coord_data += '--\n'
+    coord_data += '-1 1'
 
     for line1 in coords1:
         items = line1.split()
@@ -49,8 +51,8 @@ def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_
                   '}\n' \
                   '\nset {\n' \
                   'basis jun-cc-pVDZ\n' \
-                  'scf_type df\n' \
-                  'freeze_core true\n' \
+                  'scf_type DF\n' \
+                  'freeze_core True\n' \
                   '}\n'
 
     coord_data += '\n' + 'memory ' + str(memory) + 'GB\n'
