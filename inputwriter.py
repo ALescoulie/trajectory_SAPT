@@ -109,16 +109,34 @@ def check_inputs(selection: list, start: int, stop: int, step: int, universe: md
     print('Input Parameters Accepted')
 
 
+def write_sh(in_path: str, memory: str, cpus: str, walltime: str) -> None:
+    with open(in_path + 'sh', 'w+') as outpath:
+        outpath.write('#!/bin/bash\n')
+        outpath.write('#\n')
+        outpath.write(f'#PBS -N {in_path}\n')
+        outpath.write(f'#PBS -l select=1:ncpus={cpus}:mem={memory}')
+        outpath.write(f'#PBS -l walltime={walltime}')
+        outpath.write('#PBS -q skystd')
+        outpath.write('#PBS -j oe')
+        outpath.write('cd $PBS_O_WORKDIR')
+        outpath.write('module load anaconda3/5.1.0-gcc/8.3.1')
+        outpath.write('source activate p4env')
+        outpath.write(f'psi4 -i {in_path}.in -o {in_path}.out')
+
+
 class InputError(Exception):
     pass
 
 
 class Psi4SAPTGenerator(AnalysisBase):
-    def __init__(self, universe: mda.Universe, selections: list, memory: int, input_directory: str, molecule_name: str):
+    def __init__(self, universe: mda.Universe, selections: list, run_settings: dict, input_directory: str,
+                 molecule_name: str):
         super(Psi4SAPTGenerator, self).__init__(universe.trajectory)
         self._unv = universe
         self._sel = selections
-        self._mem = memory
+        self._mem = run_settings['mem']
+        self._cpu = run_settings['cpu']
+        self._wlt = run_settings['time']
         self._dir = input_directory
         self._mol = molecule_name
 
@@ -140,8 +158,9 @@ class Psi4SAPTGenerator(AnalysisBase):
             coords0 = read_xyz(f'{self._dir}/{pair[0]}.xyz')
             coords1 = read_xyz(f'{self._dir}/{pair[1]}.xyz')
 
-            path = f'{self._dir}/frame{time}_{pair[0]}_{pair[1]}.in'
-            save_sapt_in(coords0, coords1, self._mem, path, name)
+            path = f'{self._dir}/frame{time}_{pair[0]}_{pair[1]}.'
+            save_sapt_in(coords0, coords1, self._mem, path + 'in', name)
+            write_sh(path, self._mem, self._cpu, self._wlt)
 
     def _conclude(self):
         for path in self.selection_names:
@@ -150,6 +169,30 @@ class Psi4SAPTGenerator(AnalysisBase):
 
 
 if __name__ == '__main__':
-    topology_path = ''
-    trajectory_path = ''
+    return_file_dir = ''
+    molecule_name = ''
+    topology = ''
+    trajectory = ['']
 
+    # Saving simulation data as an MDAnalysis Universe object
+    unv = mda.Universe(topology, trajectory)
+
+    atom_group_selections = []
+    atom_group_names = []
+    group_pair_selections = []
+
+    start = 0
+    step = 0
+    stop = 0
+    memory = ''
+    cpus = ''
+    time = ''
+
+    settings = {'mem': memory,
+                'cpu': cpus,
+                'time': time}
+
+    selections = [atom_group_selections, atom_group_names, group_pair_selections]
+    check_inputs(selections, start, stop, step, unv)
+
+    Psi4SAPTGenerator(unv, selections, settings, return_file_dir, molecule_name).run(start, stop, step)
