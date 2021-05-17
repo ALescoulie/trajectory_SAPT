@@ -25,9 +25,9 @@ def read_xyz(xyz_path):
     # Saves coords as a string
 
 
-def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_name: str):
+def save_sapt_in(coords0: list, coords1: list, char0: str, char1: str, memory: str, path: str, molecule_name: str):
     coord_data = 'molecule %s {\n' % molecule_name
-    coord_data += '-1 1\n'
+    coord_data += f'{char0}\n'
 
     for line0 in coords0:
         items = line0.split()
@@ -37,7 +37,7 @@ def save_sapt_in(coords0: list, coords1: list, memory: int, path: str, molecule_
         coord_data += (line0 + '\n')
 
     coord_data += '--\n'
-    coord_data += '0 1\n'
+    coord_data += f'{char1}\n'
 
     for line1 in coords1:
         items = line1.split()
@@ -82,8 +82,8 @@ def check_inputs(selection: list, start: int, stop: int, step: int, universe: md
             raise InputError('Error in selection: {}'.format(sel))
 
     for pair in ag_pair:
-        if len(pair) != 2:
-            raise InputError('Pairs must be a python list of string with only two items')
+        if len(pair) != 4:
+            raise InputError('Pairs must be a python list of string with 4 items')
         found0 = False
         found1 = False
         for name in ag_names:
@@ -147,6 +147,7 @@ class Psi4SAPTGenerator(AnalysisBase):
         self.selection_coords = self._sel[0]
         self.selection_names = self._sel[1]
         self.interaction_pairs = self._sel[2]
+        self.selection_char = self._sel[3]
 
     def _single_frame(self):
         for ind in range(len(self.selection_coords)):
@@ -168,7 +169,7 @@ class Psi4SAPTGenerator(AnalysisBase):
             os.remove(path)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # Pragma: No cover
     return_file_dir = ''
     molecule_name = ''
     topology = ''
@@ -180,6 +181,7 @@ if __name__ == '__main__':
     atom_group_selections = []
     atom_group_names = []
     group_pair_selections = []
+    group_pair_chars = []
 
     start = 0
     step = 0
@@ -192,7 +194,7 @@ if __name__ == '__main__':
                 'cpu': cpus,
                 'time': time}
 
-    selections = [atom_group_selections, atom_group_names, group_pair_selections]
+    selections = [atom_group_selections, atom_group_names, group_pair_selections, group_pair_chars]
     check_inputs(selections, start, stop, step, unv)
 
     Psi4SAPTGenerator(unv, selections, settings, return_file_dir, molecule_name).run(start, stop, step)

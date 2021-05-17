@@ -22,8 +22,8 @@ class FrameTest(unittest.TestCase):
                     ind += 1
 
     def test_read_write_xyz1(self) -> None:
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         ag = 'resid 2'
         path = 'Arg2'
@@ -40,7 +40,7 @@ class FrameTest(unittest.TestCase):
     def test_save_sapt_in(self) -> None:
         coords1 = read_xyz('Met1.xyz')
         coords2 = read_xyz('Arg2.xyz')
-        save_sapt_in(coords1, coords2, 12, 'frame1_Met1_Arg2.in', 'test')
+        save_sapt_in(coords1, coords2, '0 1', '1 1', '12', 'frame1_Met1_Arg2.in', 'test')
         sapt1 = []
         sapt2 = []
         with open('frame1_Met1_Arg2.in', 'r') as sapt:
@@ -48,7 +48,7 @@ class FrameTest(unittest.TestCase):
             for line in sapt_data:
                 sapt1.append(line)
 
-        with open('testfiles/test.in', 'r') as test:
+        with open('test.in', 'r') as test:
             test_data = test.readlines()
             for line in test_data:
                 sapt2.append(line)
@@ -57,9 +57,9 @@ class FrameTest(unittest.TestCase):
     def test_check_inputs0(self) -> None:
         atom_groups = ['resid 1', 'resid 2']
         group_names = ['Met1']
-        ag_pairs = [['Met1', 'Met1']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        ag_pairs = [['Met1', 'Met1', '0 1', '0 1']]
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
@@ -71,8 +71,8 @@ class FrameTest(unittest.TestCase):
         atom_groups = ['resid 1', 'resid 2']
         group_names = ['Met1', 'Met3', 'Arg2']
         ag_pairs = [['Met1', 'Met1']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
@@ -84,8 +84,8 @@ class FrameTest(unittest.TestCase):
         atom_groups = ['resid 1', 'res 2']
         group_names = ['Met1', 'Arg2']
         ag_pairs = [['Met1', 'Arg2']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
@@ -97,21 +97,21 @@ class FrameTest(unittest.TestCase):
         atom_groups = ['resid 1', 'resid 2']
         group_names = ['Met1', 'Arg2']
         ag_pairs = [['Met1', 'Arg2', 'Met1']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
             check_inputs(selections, 1, 4, 1, unv)
         except InputError as e:
-            self.assertEqual(str(e), 'Pairs must be a python list of string with only two items')
+            self.assertEqual(str(e), 'Pairs must be a python list of string with 4 items')
 
     def test_check_inputs4(self) -> None:
         atom_groups = ['resid 1', 'resid 2']
         group_names = ['Met1', 'Arg2']
-        ag_pairs = [['Asp2', 'Met1']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        ag_pairs = [['Asp2', 'Met1', '1 1', '0 1']]
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
@@ -122,9 +122,9 @@ class FrameTest(unittest.TestCase):
     def test_check_inputs5(self) -> None:
         atom_groups = ['resid 1', 'resid 2']
         group_names = ['Met1', 'Arg2']
-        ag_pairs = [['Met1', 'Asp2']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        ag_pairs = [['Arg2', 'Asp1', '1 1', '0 1']]
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
@@ -135,9 +135,9 @@ class FrameTest(unittest.TestCase):
     def test_check_inputs6(self) -> None:
         atom_groups = ['resid 1', 'resid 2']
         group_names = ['Met1', 'Arg2']
-        ag_pairs = [['Met1', 'Arg2']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        ag_pairs = [['Arg2', 'Met1', '1 1', '0 1']]
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
@@ -148,9 +148,9 @@ class FrameTest(unittest.TestCase):
     def test_check_inputs7(self) -> None:
         atom_groups = ['resid 1', 'resid 2']
         group_names = ['Met1', 'Arg2']
-        ag_pairs = [['Met1', 'Arg2']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        ag_pairs = [['Arg2', 'Met1', '1 1', '0 1']]
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
@@ -161,9 +161,9 @@ class FrameTest(unittest.TestCase):
     def test_check_inputs8(self) -> None:
         atom_groups = ['resid 1', 'resid 2']
         group_names = ['Met1', 'Arg2']
-        ag_pairs = [['Met1', 'Arg2']]
-        top = 'testfiles/testtop.psf'
-        trj = 'testfiles/testtraj.dcd'
+        ag_pairs = [['Arg2', 'Met1', '1 1', '0 1']]
+        top = 'testtop.psf'
+        trj = 'testtraj.dcd'
         unv = mda.Universe(top, trj)
         selections = [atom_groups, group_names, ag_pairs]
         try:
