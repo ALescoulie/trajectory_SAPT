@@ -147,7 +147,6 @@ class Psi4SAPTGenerator(AnalysisBase):
         self.selection_coords = self._sel[0]
         self.selection_names = self._sel[1]
         self.interaction_pairs = self._sel[2]
-        self.selection_char = self._sel[3]
 
     def _single_frame(self):
         for ind in range(len(self.selection_coords)):
